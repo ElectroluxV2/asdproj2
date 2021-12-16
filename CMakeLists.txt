@@ -3,4 +3,4 @@ project(asdproj2 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(asdproj2 main.c)
+add_executable(asdproj2 main.c heap.h shared.h queue.h)
