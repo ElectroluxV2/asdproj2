@@ -24,53 +24,55 @@ void insert(struct array* queue, struct group item);
 int main() {
     struct array array;
     array.pointer = malloc(sizeof(struct group) * 6);
-    array.length = 6;
+    array.length = 4;
 
     struct group g0;
     g0.value = malloc(sizeof(char));
-    *g0.value = 'a';
+    *g0.value = 'A';
     g0.count = 45;
     *array.pointer = g0;
 
     struct group g1;
     g1.value = malloc(sizeof(char));
-    *g1.value = 'b';
-    g1.count = 13;
+    *g1.value = 'C';
+    g1.count = 5;
     *(array.pointer + 1) = g1;
 
     struct group g2;
     g2.value = malloc(sizeof(char));
-    *g2.value = 'c';
-    g2.count = 12;
+    *g2.value = 'G';
+    g2.count = 5;
     *(array.pointer + 2) = g2;
 
     struct group g3;
     g3.value = malloc(sizeof(char));
-    *g3.value = 'd';
-    g3.count = 16;
+    *g3.value = 'T';
+    g3.count = 45;
     *(array.pointer + 3) = g3;
 
-    struct group g4;
-    g4.value = malloc(sizeof(char));
-    *g4.value = 'e';
-    g4.count = 9;
-    *(array.pointer + 4) = g4;
-
-    struct group g5;
-    g5.value = malloc(sizeof(char));
-    *g5.value = 'f';
-    g5.count = 5;
-    *(array.pointer + 5) = g5;
+//    struct group g4;
+//    g4.value = malloc(sizeof(char));
+//    *g4.value = 'e';
+//    g4.count = 9;
+//    *(array.pointer + 4) = g4;
+//
+//    struct group g5;
+//    g5.value = malloc(sizeof(char));
+//    *g5.value = 'f';
+//    g5.count = 5;
+//    *(array.pointer + 5) = g5;
 
     buildHeap(&array);
 
     unsigned long long originalLength = array.length;
 
+    printArray(array);
+
     for (unsigned long long i = 0; i < originalLength - 1; i++) {
         struct group left = extract(&array);
         struct group right = extract(&array);
 
-        printf("left: %lld, right: %lld\n", left.count, right.count);
+        printf("left: %s:%lld, right: %s:%lld\n", left.value, left.count, right.value, right.count);
         struct group toInsert;
         toInsert.value = malloc(sizeof(left.value) + sizeof(right.value));
         toInsert.count = left.count + right.count;
@@ -81,9 +83,9 @@ int main() {
         free(right.value);
 
         insert(&array, toInsert);
-    }
 
-    printArray(array);
+        printArray(array);
+    }
 
     for (unsigned long long i = 0; i < array.length; i++) {
         struct group group = *(array.pointer + i);
