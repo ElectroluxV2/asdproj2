@@ -56,10 +56,34 @@ int main() {
         pointerToLatestFreeGroup->value = combineStrings(left->value, right->value);
         pointerToLatestFreeGroup->count = left->count + right->count;
 
+        left->parent = pointerToLatestFreeGroup;
+        left->isRightChild = false;
+
+        right->parent = pointerToLatestFreeGroup;
+        right->isRightChild = true;
+
         insert(queue, &currentQueueLength, pointerToLatestFreeGroup);
     }
 
+    // No more needed
     free(queue);
+
+    // Decode bit values for first n groups
+    for (unsigned long long index = 0; index < totalUniqueCharacters; index++) {
+        group* currentGroup = groups + index;
+        char characterToBeEncoded = *currentGroup->value;
+        char* byteValue = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
+
+        // This will get byte value in reversed order
+        while (currentGroup->parent != NULL) {
+            strcat(byteValue, currentGroup->isRightChild ? "1" : "0");
+
+            currentGroup = currentGroup->parent;
+        }
+
+        printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
+        free(byteValue);
+    }
 
     for (unsigned long long index = 0; index < totalPossibleGroupsInStore; index++) {
         free((groups + index)->value);
