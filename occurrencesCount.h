@@ -69,6 +69,11 @@ group* getGroupsFromOccurrences(const unsigned long long int *occurrences, unsig
         currentGroup->count = *(occurrences + i);
     }
 
+    // End of context char '\0'
+    group* trailingNull = (groups + (*lastFreeGroupsIndex)++);
+    trailingNull->value = convertIntToCharacterSingletonArray('\0' - ' ');
+    trailingNull->count = 1;
+
     return groups;
 }
 
