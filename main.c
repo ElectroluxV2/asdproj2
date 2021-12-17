@@ -20,7 +20,7 @@ char* createDynamicStringTBD(const char* str) {
 int main() {
     unsigned long long* occurrences = countOccurrencesOfCharactersInFile("./../input");
     // n
-    unsigned long long totalUniqueCharacters = countNonZero(occurrences);
+    unsigned long long totalUniqueCharacters = countNonZero(occurrences) + 1;
     // There always will be 2n - 1 output groups
     unsigned long long totalPossibleGroupsInStore = totalUniqueCharacters + totalUniqueCharacters - 1;
 
