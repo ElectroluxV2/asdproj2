@@ -64,6 +64,12 @@ int main() {
     // No more needed
     free(queue);
 
+    char** dictionary = malloc(sizeof (char*) * ('z' - 'a' + 1 + 1)); // dictionary as an array of pointers
+                                                                           // to strings representing char codes
+
+    for (int i = 0; i < 'z' - 'a' + 1; i++) {
+        *(dictionary + i) = NULL;
+    }
     // Decode bit values for first n groups
     for (unsigned long long index = 0; index < totalUniqueCharacters; index++) {
         group* currentGroup = groups + index;
@@ -78,7 +84,15 @@ int main() {
         }
 
 
-        printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
+        //printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
+
+        unsigned int dictionaryIndex = 0;
+        if (characterToBeEncoded == '\000') dictionaryIndex = 'z' - 'a' + 1; // last index of dictionary
+        else dictionaryIndex = (int)(characterToBeEncoded - 'a');
+
+        char* reversedString = stringReverse(byteValue);
+        *(dictionary + dictionaryIndex) = malloc(sizeof (reversedString));
+        strcpy(*(dictionary + dictionaryIndex), reversedString);
 
         free(byteValue);
     }
@@ -99,8 +113,16 @@ int main() {
 
     int c;
     while ((c = fgetc(file)) != EOF) {
-        printf("Character: %c byteValue: %s\n", c, "aaaa");
+        unsigned int dictionaryIndex = 0;
+        dictionaryIndex = c - 'a';
+        printf("Character: %c byteValue: %s\n", c, *(dictionary + dictionaryIndex));
     }
+
+    for (int i = 0; i < 'z' - 'a' + 1; i++) {
+        if (*(dictionary + i) != NULL) free(*(dictionary + i));
+    }
+
+    free(dictionary);
 
     fclose(file);
 }
