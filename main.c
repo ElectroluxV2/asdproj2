@@ -1,6 +1,7 @@
 #include "shared.h"
 #include "heap.h"
 #include "queue.h"
+#include "occurrencesCount.h"
 
 void addGroupTBD(group* array, const unsigned long long index, char* value, const unsigned long long count) {
     group created = {
@@ -17,21 +18,16 @@ char* createDynamicStringTBD(const char* str) {
 }
 
 int main() {
+    unsigned long long* occurrences = countOccurrencesOfCharactersInFile("./../input");
     // n
-    unsigned long long totalUniqueCharacters = 6;
+    unsigned long long totalUniqueCharacters = countNonZero(occurrences);
     // There always will be 2n - 1 output groups
     unsigned long long totalPossibleGroupsInStore = totalUniqueCharacters + totalUniqueCharacters - 1;
 
-    group* groups = malloc(sizeof(group) * totalPossibleGroupsInStore);
-
     // First n groups will be created during counting phase
-    unsigned long long  lastFreeGroupsIndex = 0;
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("a"), 45);
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("b"), 13);
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("c"), 12);
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("d"), 16);
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("e"), 9);
-    addGroupTBD(groups, lastFreeGroupsIndex++, createDynamicStringTBD("f"), 5);
+    unsigned long long lastFreeGroupsIndex = 0;
+    group* groups = getGroupsFromOccurrences(occurrences, totalPossibleGroupsInStore, &lastFreeGroupsIndex);
+    free(occurrences);
 
     // Our queue will never exceed n
     group** queue = malloc(sizeof(group*) * totalUniqueCharacters);
@@ -50,7 +46,7 @@ int main() {
         group* left = extract(queue, &currentQueueLength);
         group* right = extract(queue, &currentQueueLength);
 
-        printf("left: %s:%lld, right: %s:%lld\n", (char*) left->value, left->count, (char*) right->value, right->count);
+//        printf("left: %s:%lld, right: %s:%lld\n", (char*) left->value, left->count, (char*) right->value, right->count);
 
         group* pointerToLatestFreeGroup = (groups + lastFreeGroupsIndex++);
         pointerToLatestFreeGroup->value = combineStrings(left->value, right->value);

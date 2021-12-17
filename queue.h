@@ -6,7 +6,6 @@
 #define ASDPROJ2_QUEUE_H
 
 #include "shared.h"
-#include "heap.h"
 
 struct group* extract(struct group** queue, unsigned long long* currentQueueLength) {
     group* item = *(queue);
