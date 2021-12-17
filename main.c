@@ -77,7 +77,9 @@ int main() {
             currentGroup = currentGroup->parent;
         }
 
+
         printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
+
         free(byteValue);
     }
 
@@ -86,4 +88,19 @@ int main() {
     }
 
     free(groups);
+
+
+    FILE* file = fopen("./../input", "r");
+    size_t n = 0;
+
+    fseek(file, 0, SEEK_END);
+    long f_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        printf("Character: %c byteValue: %s\n", c, "aaaa");
+    }
+
+    fclose(file);
 }
