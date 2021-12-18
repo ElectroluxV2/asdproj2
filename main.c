@@ -17,6 +17,23 @@ char* createDynamicStringTBD(const char* str) {
     return dynamic;
 }
 
+unsigned long long calculateSizeOfEncodedInputInBytes(char** dictionary, FILE* input) {
+    unsigned long long size = 0;
+
+    fseek(input, 0, SEEK_END);
+    fseek(input, 0, SEEK_SET);
+
+    int c;
+    while ((c = fgetc(input)) != EOF) {
+        unsigned int dictionaryIndex = 0;
+        dictionaryIndex = c - 'a';
+        size += strlen(*(dictionary + dictionaryIndex));
+    }
+    size += strlen(*(dictionary + 'z' - 'a' + 1));
+    unsigned long long complement = size % 8;
+    return (size + (8 - complement)) / 8;
+}
+
 int main() {
     unsigned long long* occurrences = countOccurrencesOfCharactersInFile("./../input");
     // n
@@ -46,7 +63,7 @@ int main() {
         group* left = extract(queue, &currentQueueLength);
         group* right = extract(queue, &currentQueueLength);
 
-//        printf("left: %s:%lld, right: %s:%lld\n", (char*) left->value, left->count, (char*) right->value, right->count);
+        //printf("left: %s:%lld, right: %s:%lld\n", (char*) left->value, left->count, (char*) right->value, right->count);
 
         group* pointerToLatestFreeGroup = (groups + lastFreeGroupsIndex++);
         pointerToLatestFreeGroup->value = combineStrings(left->value, right->value);
@@ -65,7 +82,7 @@ int main() {
     free(queue);
 
     char** dictionary = malloc(sizeof (char**) * ('z' - 'a' + 1 + 1)); // dictionary as an array of pointers
-                                                                           // to strings representing char codes
+                                                                            // to strings representing char codes
 
     for (int i = 0; i < 'z' - 'a' + 1; i++) {
         *(dictionary + i) = NULL;
@@ -79,27 +96,16 @@ int main() {
         if (characterToBeEncoded == '\000') dictionaryIndex = 'z' - 'a' + 1; // last index of dictionary
         else dictionaryIndex = (int)(characterToBeEncoded - 'a');
 
-        //char* byteValue = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
-        *(dictionary + dictionaryIndex) = calloc(sizeof(char), 10);
+        *(dictionary + dictionaryIndex) = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
 
         // This will get byte value in reversed order
         while (currentGroup->parent != NULL) {
             strcat(*(dictionary + dictionaryIndex), currentGroup->isRightChild ? "1" : "0");
-
             currentGroup = currentGroup->parent;
         }
-
-
         //printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
 
-
         stringReverse(*(dictionary + dictionaryIndex));
-        //char* reversedString = stringReverse(byteValue);
-        //*(dictionary + dictionaryIndex) = malloc(sizeof (reversedString));
-        //strcpy(*(dictionary + dictionaryIndex), reversedString);
-
-
-        //free(byteValue);
     }
 
     for (unsigned long long index = 0; index < totalPossibleGroupsInStore; index++) {
@@ -111,7 +117,6 @@ int main() {
 
     FILE* file = fopen("./../input", "r");
     size_t n = 0;
-
     fseek(file, 0, SEEK_END);
     long f_size = ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -122,6 +127,9 @@ int main() {
         dictionaryIndex = c - 'a';
         printf("Character: %c byteValue: %s\n", c, *(dictionary + dictionaryIndex));
     }
+
+    unsigned long size = calculateSizeOfEncodedInputInBytes(dictionary, file);
+    printf("Size: %luB\n", size);
 
     for (int i = 0; i < 'z' - 'a' + 1; i++) {
         if (*(dictionary + i) != NULL) free(*(dictionary + i));

@@ -38,15 +38,24 @@ static char* combineStrings(const char* first, const char* second) {
     return combined;
 }
 
-char* stringReverse(char *string) {
-    for (unsigned long i = strlen(string) - 1, j = 0; i > j; i--, j++) {
-//        const char tmp = *(string + i);
-//        *(string + i) = *(string + j);
-//        *(string + j) = tmp;
-        swap(string + i, string + j);
-    }
+//char* stringReverse(char *string) {
+//    for (unsigned long i = strlen(string) - 1, j = 0; i > j; i--, j++) {
+////        const char tmp = *(string + i);
+////        *(string + i) = *(string + j);
+////        *(string + j) = tmp;
+//        swap(string + i, string + j);
+//    }
+//
+//    return string;
+//}
 
-    return string;
+void stringReverse(char *string) {
+    unsigned int length = strlen(string);
+    for (int i = 0; i < length / 2; i++) {
+        char tmp = *(string + i);
+        *(string + i) = *(string + length - 1 - i);
+        *(string + length - 1 - i) = tmp;
+    }
 }
 
 #endif //ASDPROJ2_SHARED_H
