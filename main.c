@@ -64,7 +64,7 @@ int main() {
     // No more needed
     free(queue);
 
-    char** dictionary = malloc(sizeof (char*) * ('z' - 'a' + 1 + 1)); // dictionary as an array of pointers
+    char** dictionary = malloc(sizeof (char**) * ('z' - 'a' + 1 + 1)); // dictionary as an array of pointers
                                                                            // to strings representing char codes
 
     for (int i = 0; i < 'z' - 'a' + 1; i++) {
@@ -74,11 +74,17 @@ int main() {
     for (unsigned long long index = 0; index < totalUniqueCharacters; index++) {
         group* currentGroup = groups + index;
         char characterToBeEncoded = *currentGroup->value;
-        char* byteValue = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
+
+        unsigned int dictionaryIndex = 0;
+        if (characterToBeEncoded == '\000') dictionaryIndex = 'z' - 'a' + 1; // last index of dictionary
+        else dictionaryIndex = (int)(characterToBeEncoded - 'a');
+
+        //char* byteValue = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
+        *(dictionary + dictionaryIndex) = calloc(sizeof(char), 10);
 
         // This will get byte value in reversed order
         while (currentGroup->parent != NULL) {
-            strcat(byteValue, currentGroup->isRightChild ? "1" : "0");
+            strcat(*(dictionary + dictionaryIndex), currentGroup->isRightChild ? "1" : "0");
 
             currentGroup = currentGroup->parent;
         }
@@ -86,15 +92,14 @@ int main() {
 
         //printf("Character: %c byteValue: %s\n", characterToBeEncoded, stringReverse(byteValue));
 
-        unsigned int dictionaryIndex = 0;
-        if (characterToBeEncoded == '\000') dictionaryIndex = 'z' - 'a' + 1; // last index of dictionary
-        else dictionaryIndex = (int)(characterToBeEncoded - 'a');
 
-        char* reversedString = stringReverse(byteValue);
-        *(dictionary + dictionaryIndex) = malloc(sizeof (reversedString));
-        strcpy(*(dictionary + dictionaryIndex), reversedString);
+        stringReverse(*(dictionary + dictionaryIndex));
+        //char* reversedString = stringReverse(byteValue);
+        //*(dictionary + dictionaryIndex) = malloc(sizeof (reversedString));
+        //strcpy(*(dictionary + dictionaryIndex), reversedString);
 
-        free(byteValue);
+
+        //free(byteValue);
     }
 
     for (unsigned long long index = 0; index < totalPossibleGroupsInStore; index++) {

@@ -16,20 +16,20 @@ typedef struct group {
     bool isRightChild;
 } group;
 
-//static inline void swap(void* first, void* second) {
-//    size_t size = sizeof(first);
-//    void* tmp = malloc(size);
-//    memcpy(tmp, first, size);
-//    memcpy(first, second, size);
-//    memcpy(second, tmp, size);
-//    free(tmp);
-//}
-
-static inline void swap(group** first, group** second) {
-    group* tmp = *first;
-    *first = *second;
-    *second = tmp;
+static inline void swap(void* first, void* second) {
+    size_t size = sizeof(first);
+    void* tmp = malloc(size);
+    memcpy(tmp, first, size);
+    memcpy(first, second, size);
+    memcpy(second, tmp, size);
+    free(tmp);
 }
+
+//static inline void swap(group** first, group** second) {
+//    group* tmp = *first;
+//    *first = *second;
+//    *second = tmp;
+//}
 
 static char* combineStrings(const char* first, const char* second) {
     char* combined = malloc(sizeof(first) + sizeof(second));
@@ -40,9 +40,10 @@ static char* combineStrings(const char* first, const char* second) {
 
 char* stringReverse(char *string) {
     for (unsigned long i = strlen(string) - 1, j = 0; i > j; i--, j++) {
-        const char tmp = *(string + i);
-        *(string + i) = *(string + j);
-        *(string + j) = tmp;
+//        const char tmp = *(string + i);
+//        *(string + i) = *(string + j);
+//        *(string + j) = tmp;
+        swap(string + i, string + j);
     }
 
     return string;
