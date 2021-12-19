@@ -7,47 +7,40 @@
 
 #include "shared.h"
 
-//static const unsigned long long array[94]; // Total supported ascii keys (' ' - '~')
-//static const unsigned long long* get(char key) {
-//    return array + (key - ' '); // Space has the lowest
-//}
+// Total supported ascii keys
+static const unsigned TOTAL_POSSIBLE_KEYS_IN_OCCURRENCES_MAP = ' ' - '~';
+// Amount we need to subtract from evey key to start indexing from 0 ak. int value of the lowest possible char key.
+static const unsigned KEY_OFFSET_IN_OCCURRENCES_MAP = ' ';
 
-unsigned long long* makeMap() {
-    return calloc(sizeof(unsigned long long),94); // Total supported ascii keys (' ' - '~')
+unsigned long long* makeOccurrencesMap() {
+    return calloc(sizeof(unsigned long long),TOTAL_POSSIBLE_KEYS_IN_OCCURRENCES_MAP);
 }
 
-unsigned long long* getValue(unsigned long long* map, const int key) {
-    return map + (key - ' '); // Space has the lowest ascii value
+unsigned long long* getOccurrences(unsigned long long* occurrences, const char key) {
+    return occurrences + (key - KEY_OFFSET_IN_OCCURRENCES_MAP);
 }
 
-unsigned short countNonZero(const unsigned long long* map) {
+unsigned short countTotalNonZeroOccurrences(const unsigned long long* occurrences) {
     unsigned short count = 0;
-    for (unsigned short i = 0; i < 94; i++) {
-        if ((*(map + i)) > 0) {
-            count++;
-        }
+    for (unsigned short i = 0; i < TOTAL_POSSIBLE_KEYS_IN_OCCURRENCES_MAP; i++) {
+        if ((*(occurrences + i)) == 0) continue;
+        count++;
     }
     return count;
 }
 
 unsigned long long* countOccurrencesOfCharactersInFile(const char* fileName) {
     FILE* file = fopen(fileName, "r");
-    size_t n = 0;
-
     if (file == NULL) return NULL; // Could not open file
 
-    fseek(file, 0, SEEK_END);
-    long f_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    unsigned long long* map = makeMap();
-    int c;
-    while ((c = fgetc(file)) != EOF) {
-        (*getValue(map, c))++;
+    unsigned long long* occurrences = makeOccurrencesMap();
+    char c;
+    while ((c = (char) fgetc(file)) != EOF) {
+        (*getOccurrences(occurrences, c))++;
     }
 
     fclose(file);
-    return map;
+    return occurrences;
 }
 
 char* convertIntToCharacterSingletonArray(int character) {
@@ -58,11 +51,11 @@ char* convertIntToCharacterSingletonArray(int character) {
     return dynamic;
 }
 
-group* getGroupsFromOccurrences(const unsigned long long int *occurrences, unsigned long long int totalPossibleGroupsInStore, unsigned long long *lastFreeGroupsIndex) {
+group* makeGroupsFromOccurrences(const unsigned long long int *occurrences, unsigned long long int totalPossibleGroupsInStore, unsigned long long *lastFreeGroupsIndex) {
     group* groups = malloc(sizeof(group) * totalPossibleGroupsInStore);
 
-    for (unsigned short i = 0; i < 94; i++) {
-        if ((*(occurrences + i)) == 0) continue;
+    for (unsigned short i = 0; i < TOTAL_POSSIBLE_KEYS_IN_OCCURRENCES_MAP; i++) {
+        if ((*(occurrences + i)) == 0) continue; // There is no other way of skipping empty values
 
         group* currentGroup = (groups + (*lastFreeGroupsIndex)++);
         currentGroup->value = convertIntToCharacterSingletonArray(i);

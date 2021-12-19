@@ -47,13 +47,13 @@ void tryToMatchStringWithDictionary(char** dictionary, const char* string, unsig
 int main() {
     unsigned long long* occurrences = countOccurrencesOfCharactersInFile("./../input");
     // n
-    unsigned long long totalUniqueCharacters = countNonZero(occurrences) + 1;
+    unsigned long long totalUniqueCharacters = countTotalNonZeroOccurrences(occurrences) + 1;
     // There always will be 2n - 1 output groups
     unsigned long long totalPossibleGroupsInStore = totalUniqueCharacters + totalUniqueCharacters - 1;
 
     // First n groups will be created during counting phase
     unsigned long long lastFreeGroupsIndex = 0;
-    group* groups = getGroupsFromOccurrences(occurrences, totalPossibleGroupsInStore, &lastFreeGroupsIndex);
+    group* groups = makeGroupsFromOccurrences(occurrences, totalPossibleGroupsInStore, &lastFreeGroupsIndex);
     free(occurrences);
 
     // Our queue will never exceed n
