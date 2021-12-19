@@ -5,9 +5,10 @@
 #ifndef ASDPROJ2_SHARED_H
 #define ASDPROJ2_SHARED_H
 
-#include <malloc.h>
-#include <memory.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <memory.h>
 
 typedef struct group {
     char* value;
