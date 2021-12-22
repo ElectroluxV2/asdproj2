@@ -37,7 +37,7 @@ char** getValueFromHuffmanDirectory(char key, char** dictionary) {
 
 void printHuffmanDirectory(char** huffmanDictionary) {
     for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        char key = (char) (' ' + i);
+        char key = (char) (KEY_OFFSET_IN_HUFFMAN_DICTIONARY + i);
         const char* value = *getValueFromHuffmanDirectory(key, huffmanDictionary);
         if (value == NULL) continue;
         printf("%c: %s\n", key, value);
@@ -51,6 +51,27 @@ unsigned countNonNullValuesInHuffmanDirectory(char** dictionary) {
         counter++;
     }
     return counter;
+}
+
+char getCharacterFromBitCode(char** huffmanDictionary, const char* searchValue) {
+    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        char key = (char) (i + KEY_OFFSET_IN_HUFFMAN_DICTIONARY);
+
+        if (key == '\0') continue;
+
+        const char* value = *(getValueFromHuffmanDirectoryByIndex(i, huffmanDictionary));
+
+        if (value == NULL) continue;
+
+        if (strcmp(searchValue, value) != 0) continue;
+
+        // 127 is reserved for \0
+        if (key == 127) return '\0';
+
+        return key;
+    }
+
+    return -1;
 }
 
 unsigned getLongestBitLength(char** dictionary) {

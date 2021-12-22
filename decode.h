@@ -41,21 +41,60 @@ bool decode(const char* input, const char* output) {
     }
 
     printHuffmanDirectory(huffmanDictionary);
-    freeHuffmanDictionary(huffmanDictionary);
-    free(huffmanDictionary);
 
-    char* bitString = calloc(sizeof(char), 2 * LONGEST_HUFFMAN_BIT_CODE);
+    char* bytesString = calloc(sizeof(char), 2 * LONGEST_HUFFMAN_BIT_CODE);
     unsigned char currentByte;
-    while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1) {
+    bool stopReading = false;
+    while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1 && !stopReading) {
 
+        char* bitString = calloc(sizeof(char), 2);
+        *(bitString + 1) = '\0';
         for (int bit = 8; bit; --bit) {  // count from 8 to 1
-            putchar(currentByte & (1 << (bit - 1)) ? '1' : '0');
+            *bitString = currentByte & (1 << (bit - 1)) ? '1' : '0';
+            strcat(bytesString, bitString);
+        }
+        free(bitString);
+
+        printf("BT: |%s|\n", bytesString);
+        //
+        for (unsigned i = 1; i <= strlen(bytesString); i++) {
+            printf("BT: |%s|\n", bytesString);
+
+            char* currentPart = calloc(sizeof(char), i + 2);
+            strncpy(currentPart, bytesString, i);
+            *(currentPart + i + 1) = '\0';
+
+            printf("Current part to find: (%d) |%s|\n", i, currentPart);
+            const char key = getCharacterFromBitCode(huffmanDictionary, currentPart);
+
+            if (key == '\0') {
+                printf("Found end of data\n");
+                stopReading = true;
+                break;
+            }
+            if (key == -1) continue;
+
+            // Flush key to output
+            fputc(key,outputPointer);
+            printf("Decoded char: %c\n", key);
+
+            // Remove from 0 to i chars from bytesString and move rest at the beginning
+            printf("BT: |%s|\n", bytesString);
+            strcpy(bytesString, bytesString + i);
+            printf("BT: |%s|\n", bytesString);
+
+            i = 0;
+
+            free(currentPart);
         }
 
-        printf(": %d\n", currentByte);
+        printf("Append next byte\n");
     }
 
-    free(bitString);
+    free(bytesString);
+
+    freeHuffmanDictionary(huffmanDictionary);
+    free(huffmanDictionary);
 
     fclose(outputPointer);
     fclose(inputPointer);
