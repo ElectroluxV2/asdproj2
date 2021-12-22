@@ -17,7 +17,7 @@ static const unsigned KEY_OFFSET_IN_HUFFMAN_DICTIONARY = ' ';
 static const unsigned LONGEST_HUFFMAN_BIT_CODE = 255; // unsigned char
 
 char** makeHuffmanDictionary() {
-    return malloc(sizeof (char**) * TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
+    return calloc(sizeof (char**), TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
 }
 
 char** getValueFromHuffmanDirectoryByIndex(unsigned index, char** dictionary) {
