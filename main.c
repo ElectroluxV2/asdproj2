@@ -5,6 +5,7 @@
 #include "occurrencesCount.h"
 #include "huffman.h"
 #include "encode.h"
+#include "decode.h"
 
 void addGroupTBD(group* array, const unsigned long long index, char* value, const unsigned long long count) {
     group created = {
@@ -47,14 +48,15 @@ void tryToMatchStringWithDictionary(char** dictionary, const char* string, unsig
 }
 
 int main() {
-    char** huffmanDictionary = getHuffmanDictionaryForFile("./../input");
+//    char** huffmanDictionary = getHuffmanDictionaryForFile("./../input");
 
-    printHuffmanDirectory(huffmanDictionary);
+//    printHuffmanDirectory(huffmanDictionary);
 
-    encode("./../input", "./../output", huffmanDictionary);
+//    encode("./../input", "./../output", huffmanDictionary);
+    decode("./../output", "./../decoded");
 
-    freeHuffmanDictionary(huffmanDictionary);
-    free(huffmanDictionary);
+//    freeHuffmanDictionary(huffmanDictionary);
+//    free(huffmanDictionary);
 
 
 //
