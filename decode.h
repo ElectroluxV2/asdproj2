@@ -18,21 +18,27 @@ bool decode(const char* input, const char* output) {
 
     for (unsigned i = 0; i < encodedDictionaryLength; i++) {
         unsigned char key;
+        unsigned char length;
         unsigned char value;
 
         fread(&key,sizeof(unsigned char),1,inputPointer);
+        fread(&length,sizeof(unsigned char),1,inputPointer);
         fread(&value,sizeof(unsigned char),1,inputPointer);
 
-        printf("K: %d, V: %d\n", key, value);
+        printf("K: %d, L: %d, V: %d => %c: |", key, length, value, key + ' ');
+        for (int bit = length; bit; --bit) {  // count from length to 1
+            putchar(value & (1 << (bit - 1)) ? '1' : '0');
+        }
+        printf("|\n");
     }
 
     unsigned char currentByte;
     while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1) {
         for (int bit = 8; bit; --bit) {  // count from 8 to 1
-            putchar(currentByte & (1 << (bit - 1)) ? '1' : '0');
+//            putchar(currentByte & (1 << (bit - 1)) ? '1' : '0');
         }
 
-        printf(": %d\n", currentByte);
+//        printf(": %d\n", currentByte);
     }
 
     fclose(outputPointer);

@@ -29,6 +29,9 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         // Flush key
         fputc(i, outputPointer);
 
+        // Flush value original length
+        fputc((unsigned char) strlen(value), outputPointer);
+
         unsigned char valueAsNumber = strtol(value, NULL, 2);
         printf("K: %d, V: %d\n", i, valueAsNumber);
 
@@ -49,7 +52,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
         if (strlen(currentBytesString) < 8) continue; // Concat more data in order to flush to drive
 
-        printf("total: %s", currentBytesString);
+//        printf("total: %s", currentBytesString);
 
         // 8 is byte +1 for trailing null
         char* singleByteString = calloc(sizeof(char), 9);
@@ -59,7 +62,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         strcpy(currentBytesString, currentBytesString + 8 * sizeof(char));
 
         // Flush singleByteString as binary number
-        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
+//        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
         unsigned char byteStingAsNumber = strtol(singleByteString, NULL, 2);
         fputc(byteStingAsNumber, outputPointer);
 
@@ -70,15 +73,15 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
     // we need to add \0 at the end and then
     // complement that string with '0' until currentBytesString will be exactly 2 bytes
     if (strlen(currentBytesString) != 0) {
-        printf("before complement: %s\n", currentBytesString);
+//        printf("before complement: %s\n", currentBytesString);
         strcat(currentBytesString,*getValueFromHuffmanDirectory('\0', huffmanDictionary));
-        printf("after complement to first byte: %s\n", currentBytesString);
+//        printf("after complement to first byte: %s\n", currentBytesString);
 
         while (strlen(currentBytesString) % 8 != 0) {
             strcat(currentBytesString, "0");
         }
 
-        printf("after complement to second byte: %s\n", currentBytesString);
+//        printf("after complement to second byte: %s\n", currentBytesString);
 
         // Flush reaming 2 bytes as numbers
         char* firstPart = calloc(sizeof(char), 9); // +1 for \0
