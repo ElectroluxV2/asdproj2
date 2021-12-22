@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "occurrencesCount.h"
 #include "huffman.h"
+#include "encode.h"
 
 void addGroupTBD(group* array, const unsigned long long index, char* value, const unsigned long long count) {
     group created = {
@@ -50,7 +51,7 @@ int main() {
 
     printHuffmanDirectory(huffmanDictionary);
 
-
+    encode("./../input", "./../output", huffmanDictionary);
 
     freeHuffmanDictionary(huffmanDictionary);
     free(huffmanDictionary);

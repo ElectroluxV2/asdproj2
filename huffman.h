@@ -14,6 +14,7 @@
 static const unsigned TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY = '~' - ' ' + 1 + 1; // +1 is for '\0' that is used in one-byte complement
 // Amount we need to subtract from evey key to start indexing from 0 ak. int value of the lowest possible char key.
 static const unsigned KEY_OFFSET_IN_HUFFMAN_DICTIONARY = ' ';
+static const unsigned LONGEST_HUFFMAN_BIT_CODE = 50;
 
 char** makeHuffmanDictionary() {
     return malloc(sizeof (char**) * TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
@@ -95,7 +96,7 @@ char** getHuffmanDictionaryForFile(const char* file) {
         group* currentGroup = groups + index;
         char characterToBeEncoded = *currentGroup->value;
 
-        *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary)) = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
+        *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary)) = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE); // TODO: better way of estimating how many bits can be
         char* currentValueInDictionary = *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary));
 
         // This will get byte value in reversed order
