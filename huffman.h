@@ -38,7 +38,9 @@ char** getValueFromHuffmanDirectory(char key, char** dictionary) {
 void printHuffmanDirectory(char** huffmanDictionary) {
     for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
         char key = (char) (' ' + i);
-        printf("%c: %s\n", key, *getValueFromHuffmanDirectory(key, huffmanDictionary));
+        const char* value = *getValueFromHuffmanDirectory(key, huffmanDictionary);
+        if (value == NULL) continue;
+        printf("%c: %s\n", key, value);
     }
 }
 
