@@ -14,6 +14,7 @@
 static const unsigned TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY = '~' - ' ' + 1 + 1; // +1 is for '\0' that is used in one-byte complement
 // Amount we need to subtract from evey key to start indexing from 0 ak. int value of the lowest possible char key.
 static const unsigned KEY_OFFSET_IN_HUFFMAN_DICTIONARY = ' ';
+static const unsigned LONGEST_HUFFMAN_BIT_CODE = 255; // unsigned char
 
 char** makeHuffmanDictionary() {
     return malloc(sizeof (char**) * TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
@@ -37,8 +38,30 @@ char** getValueFromHuffmanDirectory(char key, char** dictionary) {
 void printHuffmanDirectory(char** huffmanDictionary) {
     for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
         char key = (char) (' ' + i);
-        printf("%c: %s\n", key, *getValueFromHuffmanDirectory(key, huffmanDictionary));
+        const char* value = *getValueFromHuffmanDirectory(key, huffmanDictionary);
+        if (value == NULL) continue;
+        printf("%c: %s\n", key, value);
     }
+}
+
+unsigned countNonNullValuesInHuffmanDirectory(char** dictionary) {
+    unsigned counter = 0;
+    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
+        counter++;
+    }
+    return counter;
+}
+
+unsigned getLongestBitLength(char** dictionary) {
+    unsigned max = 0;
+    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
+        unsigned current = strlen(*getValueFromHuffmanDirectoryByIndex(i, dictionary));
+        if (current < max) continue;
+        max = current;
+    }
+    return max;
 }
 
 char** getHuffmanDictionaryForFile(const char* file) {
@@ -95,7 +118,7 @@ char** getHuffmanDictionaryForFile(const char* file) {
         group* currentGroup = groups + index;
         char characterToBeEncoded = *currentGroup->value;
 
-        *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary)) = calloc(sizeof(char), 10); // TODO: better way of estimating how many bits can be
+        *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary)) = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE); // TODO: better way of estimating how many bits can be
         char* currentValueInDictionary = *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary));
 
         // This will get byte value in reversed order
