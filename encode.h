@@ -8,7 +8,7 @@
 #include "shared.h"
 #include "huffman.h"
 
-bool encode(const char* input, const char* output, char** huffmanDictionary) {
+bool encodeWithDictionary(const char* input, const char* output, char** huffmanDictionary) {
     FILE* inputPointer = fopen(input, "r");
     FILE* outputPointer = fopen(output, "wb");
     if (inputPointer == NULL || outputPointer == NULL) return false;
@@ -105,6 +105,17 @@ bool encode(const char* input, const char* output, char** huffmanDictionary) {
     fclose(outputPointer);
     fclose(inputPointer);
     return true;
+}
+
+bool encode(const char* input, const char* output) {
+    char** huffmanDictionary = getHuffmanDictionaryForFile(input);
+    printHuffmanDirectory(huffmanDictionary);
+
+    bool status = encodeWithDictionary(input, output, huffmanDictionary);
+
+    freeHuffmanDictionary(huffmanDictionary);
+    free(huffmanDictionary);
+    return status;
 }
 
 #endif //ASDPROJ2_ENCODE_H
