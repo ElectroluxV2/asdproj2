@@ -16,6 +16,8 @@ bool decode(const char* input, const char* output) {
     fread(&encodedDictionaryLength,sizeof(unsigned char),1,inputPointer);
     printf("encoded dictionary length: %d\n", encodedDictionaryLength);
 
+    char** huffmanDictionary = makeHuffmanDictionary();
+
     for (unsigned i = 0; i < encodedDictionaryLength; i++) {
         unsigned char key;
         unsigned char length;
@@ -25,21 +27,35 @@ bool decode(const char* input, const char* output) {
         fread(&length,sizeof(unsigned char),1,inputPointer);
         fread(&value,sizeof(unsigned char),1,inputPointer);
 
-        printf("K: %d, L: %d, V: %d => %c: |", key, length, value, key + ' ');
+        *(getValueFromHuffmanDirectoryByIndex(key, huffmanDictionary)) = calloc(sizeof(char), length + 1); // +1 for \0
+        char* currentValueInDictionary = *(getValueFromHuffmanDirectoryByIndex(key, huffmanDictionary));
+
+        char* bitString = malloc(sizeof(char) * 2);
+        *(bitString + 1) = '\0';
         for (int bit = length; bit; --bit) {  // count from length to 1
-            putchar(value & (1 << (bit - 1)) ? '1' : '0');
+            *bitString = value & (1 << (bit - 1)) ? '1' : '0';
+            strcat(currentValueInDictionary, bitString);
         }
-        printf("|\n");
+//        printf("K: %d, L: %d, V: %d => %c: |%s|\n", key, length, value, key + ' ', currentValueInDictionary);
+        free(bitString);
     }
 
+    printHuffmanDirectory(huffmanDictionary);
+    freeHuffmanDictionary(huffmanDictionary);
+    free(huffmanDictionary);
+
+    char* bitString = calloc(sizeof(char), 2 * LONGEST_HUFFMAN_BIT_CODE);
     unsigned char currentByte;
     while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1) {
+
         for (int bit = 8; bit; --bit) {  // count from 8 to 1
-//            putchar(currentByte & (1 << (bit - 1)) ? '1' : '0');
+            putchar(currentByte & (1 << (bit - 1)) ? '1' : '0');
         }
 
-//        printf(": %d\n", currentByte);
+        printf(": %d\n", currentByte);
     }
+
+    free(bitString);
 
     fclose(outputPointer);
     fclose(inputPointer);

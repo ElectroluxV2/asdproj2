@@ -33,7 +33,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         fputc((unsigned char) strlen(value), outputPointer);
 
         unsigned char valueAsNumber = strtol(value, NULL, 2);
-        printf("K: %d, V: %d\n", i, valueAsNumber);
+//        printf("K: %d, V: %d\n", i, valueAsNumber);
 
         // Flush value
         fputc(valueAsNumber, outputPointer);
