@@ -14,7 +14,7 @@
 static const unsigned TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY = '~' - ' ' + 1 + 1; // +1 is for '\0' that is used in one-byte complement
 // Amount we need to subtract from evey key to start indexing from 0 ak. int value of the lowest possible char key.
 static const unsigned KEY_OFFSET_IN_HUFFMAN_DICTIONARY = ' ';
-static const unsigned LONGEST_HUFFMAN_BIT_CODE = 50;
+static const unsigned LONGEST_HUFFMAN_BIT_CODE = 255; // unsigned char
 
 char** makeHuffmanDictionary() {
     return malloc(sizeof (char**) * TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
@@ -40,6 +40,26 @@ void printHuffmanDirectory(char** huffmanDictionary) {
         char key = (char) (' ' + i);
         printf("%c: %s\n", key, *getValueFromHuffmanDirectory(key, huffmanDictionary));
     }
+}
+
+unsigned countNonNullValuesInHuffmanDirectory(char** dictionary) {
+    unsigned counter = 0;
+    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
+        counter++;
+    }
+    return counter;
+}
+
+unsigned getLongestBitLength(char** dictionary) {
+    unsigned max = 0;
+    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
+        unsigned current = strlen(*getValueFromHuffmanDirectoryByIndex(i, dictionary));
+        if (current < max) continue;
+        max = current;
+    }
+    return max;
 }
 
 char** getHuffmanDictionaryForFile(const char* file) {

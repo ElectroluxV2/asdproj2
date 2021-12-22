@@ -14,7 +14,27 @@ bool encode(const char* input, const char* output, char** huffmanDictionary) {
     if (inputPointer == NULL || outputPointer == NULL) return false;
 
     // Encode dictionary for decoding
+    unsigned char nonNullKeys = countNonNullValuesInHuffmanDirectory(huffmanDictionary);
+    printf("Non null keys: %d\n", nonNullKeys);
 
+    // First byte will always be dictionary count
+    fputc(nonNullKeys, outputPointer); // n
+
+    unsigned char longestBitLength = getLongestBitLength(huffmanDictionary);
+    // Next there will be 2n pairs in which even item will be key and odd one will be value
+    for (unsigned char i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
+        const char* value = *getValueFromHuffmanDirectoryByIndex(i, huffmanDictionary);
+        if (value == NULL) continue;
+
+        // Flush key
+        fputc(i, outputPointer);
+
+        unsigned char valueAsNumber = strtol(value, NULL, 2);
+        printf("K: %d, V: %d\n", i, valueAsNumber);
+
+        // Flush value
+        fputc(valueAsNumber, outputPointer);
+    }
 
     // Now encode file
     // TODO: This could be more performant if a stack of characters was used instead
