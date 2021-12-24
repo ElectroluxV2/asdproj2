@@ -63,6 +63,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
         // Flush singleByteString as binary number
 //        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
+        printf("flush: |%s|\n", singleByteString);
         unsigned char byteStingAsNumber = strtol(singleByteString, NULL, 2);
         fputc(byteStingAsNumber, outputPointer);
 
@@ -96,8 +97,15 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         unsigned char firstNumber = strtol(firstPart, NULL, 2);
         unsigned char secondNumber = strtol(secondPart, NULL, 2);
 
-        fputc(firstNumber, outputPointer);
-        fputc(secondNumber, outputPointer);
+        if (strlen(firstPart) == 8) {
+            fputc(firstNumber, outputPointer);
+            printf("flush: |%s|\n", firstPart);
+        }
+
+        if (strlen(secondPart) == 8) {
+            fputc(secondNumber, outputPointer);
+            printf("flush: |%s|\n", secondPart);
+        }
 
         free(firstPart);
         free(secondPart);

@@ -55,7 +55,7 @@ char* convertIntToCharacterSingletonArray(char character) {
 }
 
 group* makeGroupsFromOccurrences(const unsigned long long int *occurrences, unsigned long long int totalPossibleGroupsInStore, unsigned long long *lastFreeGroupsIndex) {
-    group* groups = malloc(sizeof(group) * totalPossibleGroupsInStore);
+    group* groups = calloc(sizeof(group), totalPossibleGroupsInStore);
 
     for (unsigned short i = 0; i < TOTAL_POSSIBLE_KEYS_IN_OCCURRENCES_MAP; i++) {
         if ((*(occurrences + i)) == 0) continue; // There is no other way of skipping empty values

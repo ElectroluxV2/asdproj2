@@ -30,8 +30,7 @@ static char* combineStrings(const char* first, const char* second) {
     return combined;
 }
 
-
-void stringReverse(char *string) {
+static void stringReverse(char *string) {
     unsigned int length = strlen(string);
     for (int i = 0; i < length / 2; i++) {
         char tmp = *(string + i);
@@ -39,5 +38,16 @@ void stringReverse(char *string) {
         *(string + length - 1 - i) = tmp;
     }
 }
+
+static char *byteToString(const unsigned char byte, char *bitString) {
+    *(bitString + 8) = '\0';
+    for (int bit = 8; bit; --bit) {  // count from 8 to 1
+        *(bitString + bit - 1) = byte & (1 << (bit - 1)) ? '1' : '0';
+    }
+    stringReverse(bitString);
+    return bitString;
+}
+
+
 
 #endif //ASDPROJ2_SHARED_H

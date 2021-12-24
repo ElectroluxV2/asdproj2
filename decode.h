@@ -42,56 +42,100 @@ bool decode(const char* input, const char* output) {
 
     printHuffmanDirectory(huffmanDictionary);
 
-    char* bytesString = calloc(sizeof(char), 2 * LONGEST_HUFFMAN_BIT_CODE);
     unsigned char currentByte;
+    char* currentByteString = calloc(sizeof(char),9);
+    char* allBytesString = calloc(sizeof(char),LONGEST_HUFFMAN_BIT_CODE * 2);
     bool stopReading = false;
-    while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1 && !stopReading) {
+    while (fread(&currentByte, sizeof(unsigned char),1,inputPointer) == 1 && !stopReading) {
+        byteToString(currentByte, currentByteString);
+        strcat(allBytesString, currentByteString);
 
-        char* bitString = calloc(sizeof(char), 2);
-        *(bitString + 1) = '\0';
-        for (int bit = 8; bit; --bit) {  // count from 8 to 1
-            *bitString = currentByte & (1 << (bit - 1)) ? '1' : '0';
-            strcat(bytesString, bitString);
-        }
-        free(bitString);
+        printf("Before any match: |%s|\n", allBytesString);
 
-        printf("BT: |%s|\n", bytesString);
-        //
-        for (unsigned i = 1; i <= strlen(bytesString); i++) {
-            printf("BT: |%s|\n", bytesString);
+        for (int i = 1; i <= strlen(allBytesString); i++) {
+            char* searchValue = calloc(sizeof(char), i + 1);
+            *(searchValue + i) = '\0';
+            strncpy(searchValue, allBytesString, i);
 
-            char* currentPart = calloc(sizeof(char), i + 2);
-            strncpy(currentPart, bytesString, i);
-            *(currentPart + i + 1) = '\0';
+            const char decodedKey = getCharacterFromBitCode(huffmanDictionary, searchValue);
 
-            printf("Current part to find: (%d) |%s|\n", i, currentPart);
-            const char key = getCharacterFromBitCode(huffmanDictionary, currentPart);
+            printf("Searching: |%s|\n", searchValue);
 
-            if (key == '\0') {
-                printf("Found end of data\n");
+            if (decodedKey == -1) continue;
+            if (decodedKey == '\0') {
+                printf("Found end code\n");
                 stopReading = true;
                 break;
             }
-            if (key == -1) continue;
 
-            // Flush key to output
-            fputc(key,outputPointer);
-            printf("Decoded char: %c\n", key);
+            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
+            fputc(decodedKey, outputPointer);
 
-            // Remove from 0 to i chars from bytesString and move rest at the beginning
-            printf("BT: |%s|\n", bytesString);
-            strcpy(bytesString, bytesString + i);
-            printf("BT: |%s|\n", bytesString);
-
+            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
+            memmove(allBytesString, allBytesString + i, strlen(allBytesString) - i + 1);
+            printf("After string substr: |%s|\n", allBytesString);
             i = 0;
-
-            free(currentPart);
+            free(searchValue);
         }
 
-        printf("Append next byte\n");
-    }
+        printf("After any match: |%s|\n", allBytesString);
 
-    free(bytesString);
+    }
+    free(allBytesString);
+    free(currentByteString);
+
+
+
+//    char* bytesString = calloc(sizeof(char), 2 * LONGEST_HUFFMAN_BIT_CODE);
+//    unsigned char currentByte;
+//    bool stopReading = false;
+//    while (fread(&currentByte, sizeof(unsigned char), 1, inputPointer) == 1 && !stopReading) {
+//
+//        char* bitString = calloc(sizeof(char), 2);
+//        *(bitString + 1) = '\0';
+//        for (int bit = 8; bit; --bit) {  // count from 8 to 1
+//            *bitString = currentByte & (1 << (bit - 1)) ? '1' : '0';
+//            strcat(bytesString, bitString);
+//        }
+//        free(bitString);
+//
+//        printf("BT: |%s|\n", bytesString);
+//        //
+//        for (unsigned i = 1; i <= strlen(bytesString); i++) {
+//            printf("BT: |%s|\n", bytesString);
+//
+//            char* currentPart = calloc(sizeof(char), i + 2);
+//            strncpy(currentPart, bytesString, i);
+//            *(currentPart + i + 1) = '\0';
+//
+//            printf("Current part to find: (%d) |%s|\n", i, currentPart);
+//            const char key = getCharacterFromBitCode(huffmanDictionary, currentPart);
+//
+//            if (key == '\0') {
+//                printf("Found end of data\n");
+//                stopReading = true;
+//                break;
+//            }
+//            if (key == -1) continue;
+//
+//            // Flush key to output
+//            fputc(key,outputPointer);
+//            printf("Decoded char: %c\n", key);
+//
+//            // Remove from 0 to i chars from bytesString and move rest at the beginning
+//            printf("BT: |%s|\n", bytesString);
+//            strcpy(bytesString, bytesString + i);
+//            printf("BT: |%s|\n", bytesString);
+//
+//            i = 0;
+//
+//            free(currentPart);
+//        }
+//
+//        printf("Append next byte\n");
+//    }
+//
+//    free(bytesString);
 
     freeHuffmanDictionary(huffmanDictionary);
     free(huffmanDictionary);
