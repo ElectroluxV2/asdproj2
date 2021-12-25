@@ -10,75 +10,51 @@
 #include "heap.h"
 #include "queue.h"
 
-// Total supported ascii keys
-static const unsigned TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY = '~' - ' ' + 1 + 1; // +1 is for '\0' that is used in one-byte complement
-// Amount we need to subtract from evey key to start indexing from 0 ak. int value of the lowest possible char key.
-static const unsigned KEY_OFFSET_IN_HUFFMAN_DICTIONARY = ' ';
 static const unsigned LONGEST_HUFFMAN_BIT_CODE = 255; // unsigned char
 
-char** makeHuffmanDictionary() {
-    return calloc(sizeof (char**), TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY);
-}
-
-char** getValueFromHuffmanDirectoryByIndex(unsigned index, char** dictionary) {
-    return dictionary + index;
-}
-
 void freeHuffmanDictionary(char** dictionary) {
-    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        free(*getValueFromHuffmanDirectoryByIndex(i, dictionary));
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        free(*(dictionary + key));
     }
 }
 
-char** getValueFromHuffmanDirectory(char key, char** dictionary) {
-    if (key == '\0') return getValueFromHuffmanDirectoryByIndex(TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY - 1, dictionary);
-    return getValueFromHuffmanDirectoryByIndex(key - KEY_OFFSET_IN_HUFFMAN_DICTIONARY, dictionary);
-}
-
 void printHuffmanDirectory(char** huffmanDictionary) {
-    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        char key = (char) (KEY_OFFSET_IN_HUFFMAN_DICTIONARY + i);
-        const char* value = *getValueFromHuffmanDirectory(key, huffmanDictionary);
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        const char* value = *(huffmanDictionary + key);
         if (value == NULL) continue;
         printf("%c: %s\n", key, value);
     }
 }
 
-unsigned countNonNullValuesInHuffmanDirectory(char** dictionary) {
-    unsigned counter = 0;
-    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
+byte countNonNullValuesInHuffmanDirectory(char** dictionary) {
+    byte counter = 0;
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        if (*(dictionary + key) == NULL) continue;
         counter++;
     }
     return counter;
 }
 
-char getCharacterFromBitCode(char** huffmanDictionary, const char* searchValue) {
-    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        char key = (char) (i + KEY_OFFSET_IN_HUFFMAN_DICTIONARY);
-
-        if (key == '\0') continue;
-
-        const char* value = *(getValueFromHuffmanDirectoryByIndex(i, huffmanDictionary));
-
+bool getKeyFromBitCode(char** huffmanDictionary, const char* searchValue, char* foundKey) {
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        const char* value = *(huffmanDictionary + key);
         if (value == NULL) continue;
 
         if (strcmp(searchValue, value) != 0) continue;
 
-        // 127 is reserved for \0
-        if (key == 127) return '\0';
-
-        return key;
+        *foundKey = key;
+        return true;
     }
 
-    return -1;
+    return false;
 }
 
-unsigned getLongestBitLength(char** dictionary) {
-    unsigned max = 0;
-    for (unsigned i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        if (*getValueFromHuffmanDirectoryByIndex(i, dictionary) == NULL) continue;
-        unsigned current = strlen(*getValueFromHuffmanDirectoryByIndex(i, dictionary));
+byte getLongestBitLength(char** dictionary) {
+    byte max = 0;
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        char* bitCode = *(dictionary + key);
+        if (bitCode == NULL) continue;
+        byte current = strlen(bitCode);
         if (current < max) continue;
         max = current;
     }
@@ -88,7 +64,7 @@ unsigned getLongestBitLength(char** dictionary) {
 char** getHuffmanDictionaryForFile(const char* file) {
     unsigned long long* occurrences = countOccurrencesOfCharactersInFile(file);
     // n
-    unsigned long long totalUniqueCharacters = countTotalNonZeroOccurrences(occurrences) + 1;
+    unsigned long long totalUniqueCharacters = countTotalNonZeroOccurrences(occurrences) + 1; // + 1 for \0
     // There always will be 2n - 1 output groups
     unsigned long long totalPossibleGroupsInStore = totalUniqueCharacters + totalUniqueCharacters - 1;
 
@@ -98,7 +74,7 @@ char** getHuffmanDictionaryForFile(const char* file) {
     free(occurrences);
 
     // Our queue will never exceed n
-    group** queue = malloc(sizeof(group*) * totalUniqueCharacters);
+    group** queue = calloc(sizeof(group*), totalUniqueCharacters);
     unsigned long long currentQueueLength = totalUniqueCharacters;
 
     // Insert pointers to groups
@@ -132,15 +108,15 @@ char** getHuffmanDictionaryForFile(const char* file) {
     // No more needed
     free(queue);
 
-    char** dictionary = makeHuffmanDictionary();
+    char** dictionary = calloc(sizeof (char**), TOTAL_POSSIBLE_ASCII_KEYS);
 
     // Decode bit values for first n groups
     for (unsigned long long index = 0; index < totalUniqueCharacters; index++) {
         group* currentGroup = groups + index;
         char characterToBeEncoded = *currentGroup->value;
 
-        *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary)) = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE); // TODO: better way of estimating how many bits can be
-        char* currentValueInDictionary = *(getValueFromHuffmanDirectory(characterToBeEncoded, dictionary));
+        *(dictionary + characterToBeEncoded) = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE);
+        char* currentValueInDictionary = *(dictionary + characterToBeEncoded);
 
         // This will get byte value in reversed order
         while (currentGroup->parent != NULL) {

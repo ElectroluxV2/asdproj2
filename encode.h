@@ -14,26 +14,27 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
     if (inputPointer == NULL || outputPointer == NULL) return false;
 
     // Encode dictionary for decoding
-    unsigned char nonNullKeys = countNonNullValuesInHuffmanDirectory(huffmanDictionary);
+    byte nonNullKeys = countNonNullValuesInHuffmanDirectory(huffmanDictionary);
     printf("Non null keys: %d\n", nonNullKeys);
 
     // First byte will always be dictionary count
     fputc(nonNullKeys, outputPointer); // n
 
-    unsigned char longestBitLength = getLongestBitLength(huffmanDictionary);
+    byte longestBitLength = getLongestBitLength(huffmanDictionary);
     // Next there will be 2n pairs in which even item will be key and odd one will be value
-    for (unsigned char i = 0; i < TOTAL_POSSIBLE_KEYS_IN_HUFFMAN_DICTIONARY; i++) {
-        const char* value = *getValueFromHuffmanDirectoryByIndex(i, huffmanDictionary);
+    for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
+        const char* value = *(huffmanDictionary + key);
+
         if (value == NULL) continue;
 
         // Flush key
-        fputc(i, outputPointer);
+        fputc(key, outputPointer);
 
         // Flush value original length
-        fputc((unsigned char) strlen(value), outputPointer);
+        fputc((byte) strlen(value), outputPointer);
 
-        unsigned char valueAsNumber = strtol(value, NULL, 2);
-//        printf("K: %d, V: %d\n", i, valueAsNumber);
+        byte valueAsNumber = strtol(value, NULL, 2);
+//        printf("K: %d, V: %d\n", key, valueAsNumber);
 
         // Flush value
         fputc(valueAsNumber, outputPointer);
@@ -46,7 +47,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
     while ((currentChar = (char) fgetc(inputPointer)) != EOF) {
         // Get huffman bit code for current character
-        const char* currentBitCode = *getValueFromHuffmanDirectory(currentChar, huffmanDictionary);
+        const char* currentBitCode = *(huffmanDictionary + currentChar);
         // Concat with current bytes complement
         strcat(currentBytesString, currentBitCode);
 
@@ -64,7 +65,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         // Flush singleByteString as binary number
 //        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
         printf("flush: |%s|\n", singleByteString);
-        unsigned char byteStingAsNumber = strtol(singleByteString, NULL, 2);
+        byte byteStingAsNumber = strtol(singleByteString, NULL, 2);
         fputc(byteStingAsNumber, outputPointer);
 
         free(singleByteString);
@@ -75,7 +76,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
     // complement that string with '0' until currentBytesString will be exactly 2 bytes
     if (strlen(currentBytesString) != 0) {
 //        printf("before complement: %s\n", currentBytesString);
-        strcat(currentBytesString,*getValueFromHuffmanDirectory('\0', huffmanDictionary));
+        strcat(currentBytesString, *(huffmanDictionary + '\0'));
 //        printf("after complement to first byte: %s\n", currentBytesString);
 
         while (strlen(currentBytesString) % 8 != 0) {
@@ -94,17 +95,17 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         strncpy(secondPart, currentBytesString + 8 * sizeof(char), 8 * sizeof(char));
         *(secondPart + 9) = '\0';
 
-        unsigned char firstNumber = strtol(firstPart, NULL, 2);
-        unsigned char secondNumber = strtol(secondPart, NULL, 2);
+        byte firstNumber = strtol(firstPart, NULL, 2);
+        byte secondNumber = strtol(secondPart, NULL, 2);
 
         if (strlen(firstPart) == 8) {
             fputc(firstNumber, outputPointer);
-            printf("flush: |%s|\n", firstPart);
+//            printf("flush: |%s|\n", firstPart);
         }
 
         if (strlen(secondPart) == 8) {
             fputc(secondNumber, outputPointer);
-            printf("flush: |%s|\n", secondPart);
+//            printf("flush: |%s|\n", secondPart);
         }
 
         free(firstPart);
