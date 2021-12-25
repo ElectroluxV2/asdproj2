@@ -3,6 +3,6 @@
 #include "decode.h"
 
 int main() {
-    encode("./../input", "./../output");
-    decode("./../output", "./../decoded");
+    encode("./../input", "./../encoded");
+    decode("./../encoded", "./../decoded");
 }
