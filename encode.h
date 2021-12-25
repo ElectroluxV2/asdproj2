@@ -15,7 +15,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
     // Encode dictionary for decoding
     byte nonNullKeys = countNonNullValuesInHuffmanDirectory(huffmanDictionary);
-    printf("Non null keys: %d\n", nonNullKeys);
+//    printf("Non null keys: %d\n", nonNullKeys);
 
     // First byte will always be dictionary count
     fputc(nonNullKeys, outputPointer); // n
@@ -64,7 +64,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
         // Flush singleByteString as binary number
 //        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
-        printf("flush: |%s|\n", singleByteString);
+//        printf("flush: |%s|\n", singleByteString);
         byte byteStingAsNumber = strtol(singleByteString, NULL, 2);
         fputc(byteStingAsNumber, outputPointer);
 
@@ -121,7 +121,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
 bool encode(const char* input, const char* output) {
     char** huffmanDictionary = getHuffmanDictionaryForFile(input);
-    printHuffmanDirectory(huffmanDictionary);
+//    printHuffmanDictionary(huffmanDictionary);
 
     bool status = encodeWithDictionary(input, output, huffmanDictionary);
 

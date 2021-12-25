@@ -18,7 +18,7 @@ void freeHuffmanDictionary(char** dictionary) {
     }
 }
 
-void printHuffmanDirectory(char** huffmanDictionary) {
+void printHuffmanDictionary(char** huffmanDictionary) {
     for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
         const char* value = *(huffmanDictionary + key);
         if (value == NULL) continue;

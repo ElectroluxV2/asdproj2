@@ -1,4 +1,3 @@
-#include "shared.h"
 #include "encode.h"
 #include "decode.h"
 

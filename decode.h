@@ -14,7 +14,7 @@ bool decode(const char* input, const char* output) {
 
     byte encodedDictionaryLength;
     fread(&encodedDictionaryLength,sizeof(byte),1,inputPointer);
-    printf("encoded dictionary length: %d\n", encodedDictionaryLength);
+//    printf("encoded dictionary length: %d\n", encodedDictionaryLength);
 
     char** huffmanDictionary = calloc(sizeof(char*), TOTAL_POSSIBLE_ASCII_KEYS);
 
@@ -40,7 +40,7 @@ bool decode(const char* input, const char* output) {
         free(bitString);
     }
 
-    printHuffmanDirectory(huffmanDictionary);
+//    printHuffmanDictionary(huffmanDictionary);
 
     byte currentByte;
     char* currentByteString = calloc(sizeof(char),9);
@@ -50,7 +50,7 @@ bool decode(const char* input, const char* output) {
         byteToString(currentByte, currentByteString);
         strcat(allBytesString, currentByteString);
 
-        printf("Before any match: |%s|\n", allBytesString);
+//        printf("Before any match: |%s|\n", allBytesString);
 
         for (int i = 1; i <= strlen(allBytesString); i++) {
             char* searchValue = calloc(sizeof(char), i + 1);
@@ -60,7 +60,7 @@ bool decode(const char* input, const char* output) {
             char decodedKey;
             if (!getKeyFromBitCode(huffmanDictionary, searchValue, &decodedKey)) continue;
 
-            printf("Searching: |%s|\n", searchValue);
+//            printf("Searching: |%s|\n", searchValue);
 
             if (decodedKey == '\0') {
                 printf("Found end code\n");
@@ -68,17 +68,17 @@ bool decode(const char* input, const char* output) {
                 break;
             }
 
-            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
+//            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
             fputc(decodedKey, outputPointer);
 
-            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
+//            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
             memmove(allBytesString, allBytesString + i, strlen(allBytesString) - i + 1);
-            printf("After string substr: |%s|\n", allBytesString);
+//            printf("After string substr: |%s|\n", allBytesString);
             i = 0;
             free(searchValue);
         }
 
-        printf("After any match: |%s|\n", allBytesString);
+//        printf("After any match: |%s|\n", allBytesString);
 
     }
 
