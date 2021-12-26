@@ -34,7 +34,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         fputc((byte) strlen(value), outputPointer);
 
         byte valueAsNumber = strtol(value, NULL, 2);
-//        printf("K: %d, V: %d\n", key, valueAsNumber);
+        printf("K: %d, V: %d\n", key, valueAsNumber);
 
         // Flush value
         fputc(valueAsNumber, outputPointer);
@@ -57,10 +57,17 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
         // 8 is byte +1 for trailing null
         char* singleByteString = calloc(sizeof(char), 9);
+
+        char* currentBytesStringTMP = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE * 2 + 1);
+
         // Remove first 8 chars from string and flush tem as binary number to output
         strncpy(singleByteString, currentBytesString, 8 * sizeof(char));
         // Move other part to the beginning
-        strcpy(currentBytesString, currentBytesString + 8 * sizeof(char));
+//        memcpy(currentBytesStringTMP, currentBytesString + 8, 8 * sizeof(char));
+        strcpy(currentBytesStringTMP, currentBytesString + 8);
+        free(currentBytesString);
+        currentBytesString = currentBytesStringTMP;
+//        memmove(currentBytesString, currentBytesString + 8, 8 * sizeof(char));
 
         // Flush singleByteString as binary number
 //        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);

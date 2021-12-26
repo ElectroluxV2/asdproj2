@@ -40,50 +40,79 @@ bool decode(const char* input, const char* output) {
         free(bitString);
     }
 
-//    printHuffmanDictionary(huffmanDictionary);
+    printHuffmanDictionary(huffmanDictionary);
 
-    byte currentByte;
-    char* currentByteString = calloc(sizeof(char),9);
-    char* allBytesString = calloc(sizeof(char),LONGEST_HUFFMAN_BIT_CODE * 2);
-    bool stopReading = false;
-    while (fread(&currentByte, sizeof(byte),1,inputPointer) == 1 && !stopReading) {
-        byteToString(currentByte, currentByteString);
-        strcat(allBytesString, currentByteString);
 
-//        printf("Before any match: |%s|\n", allBytesString);
 
-        for (int i = 1; i <= strlen(allBytesString); i++) {
-            char* searchValue = calloc(sizeof(char), i + 1);
-            *(searchValue + i) = '\0';
-            strncpy(searchValue, allBytesString, i);
-
-            char decodedKey;
-            if (!getKeyFromBitCode(huffmanDictionary, searchValue, &decodedKey)) continue;
-
-//            printf("Searching: |%s|\n", searchValue);
-
-            if (decodedKey == '\0') {
-                printf("Found end code\n");
-                stopReading = true;
-                break;
-            }
-
-//            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
-            fputc(decodedKey, outputPointer);
-
-//            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
-            memmove(allBytesString, allBytesString + i, strlen(allBytesString) - i + 1);
-//            printf("After string substr: |%s|\n", allBytesString);
-            i = 0;
-            free(searchValue);
-        }
-
-//        printf("After any match: |%s|\n", allBytesString);
+    byte current;
+    while (fread(&current, sizeof(byte), 1, inputPointer) == 1) {
+        
 
     }
 
-    free(allBytesString);
-    free(currentByteString);
+
+//    byte currentByte;
+//    char* currentByteString = calloc(sizeof(char),9);
+//    char* allBytesString = calloc(sizeof(char),(LONGEST_HUFFMAN_BIT_CODE * 2) + 1);
+//    bool stopReading = false;
+//    while (fread(&currentByte, sizeof(byte),1,inputPointer) == 1 && !stopReading) {
+//        byteToString(currentByte, currentByteString);
+//        strcat(allBytesString, currentByteString);
+//
+////        printf("Before any match: |%s|\n", allBytesString);
+//
+//        for (int i = 1; i <= strlen(allBytesString); i++) {
+//            char* searchValue = calloc(sizeof(char), i + 1);
+//            *(searchValue + i) = '\0';
+//            strncpy(searchValue, allBytesString, i);
+//
+////            if (i > 50) {
+////                printf("ERROR\n");
+////                printf("|%s|", searchValue);
+////                stopReading = true;
+////                free(searchValue);
+////                break;
+////            }
+//
+//            char decodedKey;
+//            if (!getKeyFromBitCode(huffmanDictionary, searchValue, &decodedKey)) {
+//                printf("Not found: |%s|\n", searchValue);
+//                free(searchValue);
+//                continue;
+//            }
+//
+////            printf("Searching: |%s|\n", searchValue);
+//
+//            if (decodedKey == '\0') {
+//                printf("Found end code\n");
+//                stopReading = true;
+//                free(searchValue);
+//                break;
+//            }
+//
+//            printf("Found: |%s| (%c)\n", searchValue, decodedKey);
+//
+////            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
+//            fputc(decodedKey, outputPointer);
+//
+//            char* allBytesStringTMP = calloc(sizeof(char),(LONGEST_HUFFMAN_BIT_CODE * 2) + 1);
+//
+////            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
+////            memmove(allBytesString, allBytesString + i, strlen(allBytesString) - i + 1);
+//            strcpy(allBytesStringTMP, allBytesString + i);
+//            free(allBytesString);
+//            allBytesString = allBytesStringTMP;
+////            printf("After string substr: |%s|\n", allBytesString);
+//            i = 0;
+//            free(searchValue);
+//        }
+//
+////        printf("After any match: |%s|\n", allBytesString);
+//
+//    }
+
+//    free(allBytesString);
+//    free(currentByteString);
 
     freeHuffmanDictionary(huffmanDictionary);
     free(huffmanDictionary);
