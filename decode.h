@@ -42,77 +42,75 @@ bool decode(const char* input, const char* output) {
 
     printHuffmanDictionary(huffmanDictionary);
 
+    // Represents currently read byte
+    byte currentByte;
+    // This String will contain at most 8 characters. It's string view of byte. It will consist only of '0'os and '1'ones.
+    char* currentByteString = calloc(sizeof(char),9);
+    // This String will contain at most 16 characters. Rest of previous byte and currently read byte ak. "current"
+    char* allBytesString = calloc(sizeof(char),(LONGEST_HUFFMAN_BIT_CODE * 2) + 1);
+    //
+    unsigned currentAllBytesStringLength = 0;
+    // This enables us to break outer loop by setting value to false
+    bool stopReading = false;
+
+    //
+    unsigned currentGuessLength = 1;
+    //
+    char* currentGuess = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE + 1);
 
 
-    byte current;
-    while (fread(&current, sizeof(byte), 1, inputPointer) == 1) {
-        
+    // Decoding single characters, we can only read file byte by byte
+    // This loop will read all reaming bytes from input file
+    // This loop may be terminated before reaching end of file without any special care
+    while (fread(&currentByte, sizeof(byte),1,inputPointer) == 1 && !stopReading) {
+        if (currentAllBytesStringLength > 16) {
+            fprintf(stderr, "MEMORY SAFETY CHECK ERROR (currentAllBytesStringLength)\n");
+            break;
+        }
 
+        byteToString(currentByte, currentByteString);
+//        printf("|%s|: %d\n", allBytesString, currentAllBytesStringLength);
+
+        memcpy(allBytesString + currentAllBytesStringLength, currentByteString, 8);
+        currentAllBytesStringLength += 8;
+        *(allBytesString + currentAllBytesStringLength + 1) = '\0';
+
+        while (currentGuessLength < currentAllBytesStringLength) {
+            if (currentGuessLength > LONGEST_HUFFMAN_BIT_CODE) {
+                stopReading = true;
+                fprintf(stderr, "MEMORY SAFETY CHECK ERROR (currentGuessLength)\n");
+                break;
+            }
+
+            memcpy(currentGuess, allBytesString, currentGuessLength);
+            *(currentGuess + currentGuessLength) = '\0';
+
+//            printf("Current guess: |%s|: %d\n", currentGuess, currentGuessLength);
+
+            char foundKey = ' ';
+            if (!getKeyFromBitCode(huffmanDictionary, currentGuess, &foundKey)) {
+                currentGuessLength++;
+                continue;
+            }
+
+//            printf("Found key: |%c|\n", foundKey);
+
+            if (foundKey == '\0') {
+                break;
+                stopReading = true;
+            }
+
+            fputc(foundKey, outputPointer);
+
+            currentAllBytesStringLength -= currentGuessLength;
+            memmove(allBytesString, allBytesString + currentGuessLength, currentAllBytesStringLength);
+            *(allBytesString + currentAllBytesStringLength + 1) = '\0';
+
+            currentGuessLength = 1;
+        }
     }
 
-
-//    byte currentByte;
-//    char* currentByteString = calloc(sizeof(char),9);
-//    char* allBytesString = calloc(sizeof(char),(LONGEST_HUFFMAN_BIT_CODE * 2) + 1);
-//    bool stopReading = false;
-//    while (fread(&currentByte, sizeof(byte),1,inputPointer) == 1 && !stopReading) {
-//        byteToString(currentByte, currentByteString);
-//        strcat(allBytesString, currentByteString);
-//
-////        printf("Before any match: |%s|\n", allBytesString);
-//
-//        for (int i = 1; i <= strlen(allBytesString); i++) {
-//            char* searchValue = calloc(sizeof(char), i + 1);
-//            *(searchValue + i) = '\0';
-//            strncpy(searchValue, allBytesString, i);
-//
-////            if (i > 50) {
-////                printf("ERROR\n");
-////                printf("|%s|", searchValue);
-////                stopReading = true;
-////                free(searchValue);
-////                break;
-////            }
-//
-//            char decodedKey;
-//            if (!getKeyFromBitCode(huffmanDictionary, searchValue, &decodedKey)) {
-//                printf("Not found: |%s|\n", searchValue);
-//                free(searchValue);
-//                continue;
-//            }
-//
-////            printf("Searching: |%s|\n", searchValue);
-//
-//            if (decodedKey == '\0') {
-//                printf("Found end code\n");
-//                stopReading = true;
-//                free(searchValue);
-//                break;
-//            }
-//
-//            printf("Found: |%s| (%c)\n", searchValue, decodedKey);
-//
-////            printf("Searching: |%s| found key: |%c|\n", searchValue, decodedKey);
-//            fputc(decodedKey, outputPointer);
-//
-//            char* allBytesStringTMP = calloc(sizeof(char),(LONGEST_HUFFMAN_BIT_CODE * 2) + 1);
-//
-////            printf("Before string substr: |%s| -(%s)\n", allBytesString, searchValue);
-////            memmove(allBytesString, allBytesString + i, strlen(allBytesString) - i + 1);
-//            strcpy(allBytesStringTMP, allBytesString + i);
-//            free(allBytesString);
-//            allBytesString = allBytesStringTMP;
-////            printf("After string substr: |%s|\n", allBytesString);
-//            i = 0;
-//            free(searchValue);
-//        }
-//
-////        printf("After any match: |%s|\n", allBytesString);
-//
-//    }
-
-//    free(allBytesString);
-//    free(currentByteString);
+    free(currentGuess);
 
     freeHuffmanDictionary(huffmanDictionary);
     free(huffmanDictionary);
