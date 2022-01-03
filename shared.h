@@ -43,17 +43,15 @@ static void stringReverse(char* string) {
     }
 }
 
-static char* byteToString(const byte byte, char* bitString) {
+static void byteToString(const byte byte, char* bitString) {
     *(bitString + 8) = '\0';
-    for (int bit = 8; bit; --bit) {  // count from 8 to 1
-        *(bitString + bit - 1) = byte & (1 << (bit - 1)) ? '1' : '0';
+    for (int bit = 8, index = 0; bit; --bit, index++) {  // count from 8 to 1
+        *(bitString + index) = byte & (1 << (bit - 1)) ? '1' : '0';
     }
-    stringReverse(bitString);
-    return bitString;
 }
 
 static char* convertCharacterToString(char character) {
-    char* dynamic = malloc(sizeof(char) * 2);
+    char* dynamic = calloc(sizeof(char), 2);
     *dynamic = character;
     *(dynamic + 1) = '\0';
     return dynamic;

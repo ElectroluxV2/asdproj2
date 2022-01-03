@@ -15,7 +15,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
     // Encode dictionary for decoding
     byte nonNullKeys = countNonNullValuesInHuffmanDirectory(huffmanDictionary);
-    printf("Non null keys: %d\n", nonNullKeys);
+//    printf("Non null keys: %d\n", nonNullKeys);
 
     // First byte will always be dictionary count
     fputc(nonNullKeys, outputPointer); // n
@@ -57,17 +57,20 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
         // 8 is byte +1 for trailing null
         char* singleByteString = calloc(sizeof(char), 9);
-        // Remove first 8 chars from string and flush tem as binary number to output
+
+        char* currentBytesStringTMP = calloc(sizeof(char), LONGEST_HUFFMAN_BIT_CODE * 2 + 1);
+
+        // Remove first 8 chars from string and flush them as binary number to output
         strncpy(singleByteString, currentBytesString, 8 * sizeof(char));
         // Move other part to the beginning
-        strcpy(currentBytesString, currentBytesString + 8 * sizeof(char));
-
+        unsigned long l = strlen(currentBytesString) - 8;
+        memmove(currentBytesString, currentBytesString + 8, l);
+        *(currentBytesString + l) = '\0';
         // Flush singleByteString as binary number
 //        printf(", byte: %s, rest: %s\n", singleByteString, currentBytesString);
-        printf("flush: |%s|\n", singleByteString);
+//        printf("flush: |%s|\n", singleByteString);
         byte byteStingAsNumber = strtol(singleByteString, NULL, 2);
         fputc(byteStingAsNumber, outputPointer);
-
         free(singleByteString);
     }
 
@@ -121,7 +124,7 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 
 bool encode(const char* input, const char* output) {
     char** huffmanDictionary = getHuffmanDictionaryForFile(input);
-    printHuffmanDirectory(huffmanDictionary);
+//    printHuffmanDictionary(huffmanDictionary);
 
     bool status = encodeWithDictionary(input, output, huffmanDictionary);
 

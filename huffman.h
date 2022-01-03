@@ -10,7 +10,7 @@
 #include "heap.h"
 #include "queue.h"
 
-static const unsigned LONGEST_HUFFMAN_BIT_CODE = 255; // unsigned char
+static const unsigned LONGEST_HUFFMAN_BIT_CODE = 8; // unsigned char
 
 void freeHuffmanDictionary(char** dictionary) {
     for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
@@ -18,7 +18,7 @@ void freeHuffmanDictionary(char** dictionary) {
     }
 }
 
-void printHuffmanDirectory(char** huffmanDictionary) {
+void printHuffmanDictionary(char** huffmanDictionary) {
     for (char key = 0; key < TOTAL_POSSIBLE_ASCII_KEYS; key++) {
         const char* value = *(huffmanDictionary + key);
         if (value == NULL) continue;
