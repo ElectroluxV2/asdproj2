@@ -93,10 +93,10 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
         char* secondPart = calloc(sizeof(char), 9); // +1 for \0
 
         strncpy(firstPart, currentBytesString, 8 * sizeof(char));
-        *(firstPart + 9) = '\0';
+        *(firstPart + 8) = '\0';
 
         strncpy(secondPart, currentBytesString + 8 * sizeof(char), 8 * sizeof(char));
-        *(secondPart + 9) = '\0';
+        *(secondPart + 8) = '\0';
 
         byte firstNumber = strtol(firstPart, NULL, 2);
         byte secondNumber = strtol(secondPart, NULL, 2);
@@ -123,6 +123,13 @@ bool encodeWithDictionary(const char* input, const char* output, char** huffmanD
 }
 
 bool encode(const char* input, const char* output) {
+    FILE* inputPointer = fopen(input, "r");
+    FILE* outputPointer = fopen(output, "wb");
+    if (inputPointer == NULL || outputPointer == NULL) return false;
+    fclose(inputPointer);
+    fclose(outputPointer);
+
+
     char** huffmanDictionary = getHuffmanDictionaryForFile(input);
 //    printHuffmanDictionary(huffmanDictionary);
 
