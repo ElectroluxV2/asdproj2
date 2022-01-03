@@ -40,7 +40,7 @@ bool decode(const char* input, const char* output) {
         free(bitString);
     }
 
-    printHuffmanDictionary(huffmanDictionary);
+//    printHuffmanDictionary(huffmanDictionary);
 
     // Represents currently read byte
     byte currentByte;
